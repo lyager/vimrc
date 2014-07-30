@@ -54,3 +54,27 @@ endfunction
 au FileType coffee call CoffeeScriptFold()
 
 au FileType gitcommit call setpos('.', [0, 1, 1, 0])
+
+""""""""""""""""""""""""""""""
+" => C section
+"""""""""""""""""""""""""""""""
+" Find functionname
+fun! ShowFuncName()
+  let lnum = line(".")
+  let col = col(".")
+  echohl ModeMsg
+  echo getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bW'))
+  echohl None
+  call search("\\%" . lnum . "l" . "\\%" . col . "c")
+endfun
+au FileType c map f :call ShowFuncName() <CR>
+
+" List all functions
+
+fun! ShowAllFuncName()
+  exec "!ctags -x --c-kinds=f % | awk '{print $1 \" : \" $3 }'"
+endfun
+
+au FileType c map F :call ShowAllFuncName() <CR>
+
+>>>>>>> Added map F to ShowAllFuncNames(): List all function names of current file.
