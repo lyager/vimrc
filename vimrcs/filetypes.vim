@@ -77,4 +77,13 @@ endfun
 
 au FileType c map F :call ShowAllFuncName() <CR>
 
->>>>>>> Added map F to ShowAllFuncNames(): List all function names of current file.
+""""""""""""""""""""""""""""""
+" => GitCommit section
+"""""""""""""""""""""""""""""""
+au FileType gitcommit set tw=78
+
+""""""""""""""""""""""""""""""
+" => Markdown section
+"""""""""""""""""""""""""""""""
+" Prefer my Markdown neatly wrapped
+au FileType markdown set tw=78
