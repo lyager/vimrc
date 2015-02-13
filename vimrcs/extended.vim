@@ -32,7 +32,7 @@ set guioptions-=l
 set guioptions-=L
 
 " Colorscheme
-colorscheme peaksea
+colorscheme delek
 if has("gui_running")
     set background=dark
 else
