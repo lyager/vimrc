@@ -142,7 +142,7 @@ set foldcolumn=1
 syntax enable 
 
 try
-    colorscheme desert
+    colorscheme delek
 catch
 endtry
 
@@ -171,6 +171,13 @@ set nobackup
 set nowb
 set noswapfile
 
+" When working with other peoples files and indent styles
+" it's nice to be able to put .exrc files or use modelines in 
+" a specific file
+set modelines=5
+set exrc
+set secure
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Text, tab and indent related
@@ -192,6 +199,10 @@ set tw=500
 set ai "Auto indent
 set si "Smart indent
 set wrap "Wrap lines
+
+" Execute a command in a new tab
+nnoremap <leader>r :tabnew <bar>r !
+nnoremap <leader>R :tabnew <bar>r !#<CR>
 
 
 """"""""""""""""""""""""""""""
