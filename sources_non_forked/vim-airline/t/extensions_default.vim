@@ -2,7 +2,6 @@ let g:airline_theme = 'dark'
 call airline#init#bootstrap()
 call airline#init#sections()
 source plugin/airline.vim
-call airline#load_theme()
 
 describe 'default'
   before

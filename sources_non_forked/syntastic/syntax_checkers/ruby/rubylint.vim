@@ -21,7 +21,8 @@ set cpo&vim
 
 function! SyntaxCheckers_ruby_rubylint_GetLocList() dict
     if !exists('s:rubylint_new')
-        let s:rubylint_new = syntastic#util#versionIsAtLeast(self.getVersion(), [2])
+        let s:rubylint_new = syntastic#util#versionIsAtLeast(syntastic#util#getVersion(
+            \ self.getExecEscaped() . ' --version'), [2])
     endif
     let makeprg = self.makeprgBuild({ 'args': (s:rubylint_new ? '' : 'analyze ') . '--presenter=syntastic' })
 
@@ -40,4 +41,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

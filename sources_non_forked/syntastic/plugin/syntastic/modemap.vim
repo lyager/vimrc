@@ -38,15 +38,6 @@ function! g:SyntasticModeMap.allowsAutoChecking(filetype) " {{{2
     endif
 endfunction " }}}2
 
-function! g:SyntasticModeMap.doAutoChecking() " {{{2
-    let local_mode = get(b:, 'syntastic_mode', '')
-    if local_mode ==# 'active' || local_mode ==# 'passive'
-        return local_mode ==# 'active'
-    endif
-
-    return self.allowsAutoChecking(&filetype)
-endfunction " }}}2
-
 function! g:SyntasticModeMap.isPassive() " {{{2
     return self._mode ==# 'passive'
 endfunction " }}}2
@@ -71,13 +62,13 @@ function! g:SyntasticModeMap.echoMode() " {{{2
     echo "Syntastic: " . self._mode . " mode enabled"
 endfunction " }}}2
 
-function! g:SyntasticModeMap.modeInfo(filetypes) " {{{2
-    echomsg 'Syntastic version: ' . g:_SYNTASTIC_VERSION
-    let type = len(a:filetypes) ? a:filetypes[0] : &filetype
+function! g:SyntasticModeMap.modeInfo(...) " {{{2
+    echomsg 'Syntastic version: ' . g:syntastic_version
+    let type = a:0 ? a:1 : &filetype
     echomsg 'Info for filetype: ' . type
 
     call self.synch()
-    echomsg 'Global mode: ' . self._mode
+    echomsg 'Mode: ' . self._mode
     if self._mode ==# 'active'
         if len(self._passiveFiletypes)
             let plural = len(self._passiveFiletypes) != 1 ? 's' : ''
@@ -90,14 +81,6 @@ function! g:SyntasticModeMap.modeInfo(filetypes) " {{{2
         endif
     endif
     echomsg 'Filetype ' . type . ' is ' . (self.allowsAutoChecking(type) ? 'active' : 'passive')
-
-    if !len(a:filetypes)
-        if exists('b:syntastic_mode') && (b:syntastic_mode ==# 'active' || b:syntastic_mode ==# 'passive')
-            echomsg 'Local mode: ' . b:syntastic_mode
-        endif
-
-        echomsg 'The current file will ' . (self.doAutoChecking() ? '' : 'not ') . 'be checked automatically'
-    endif
 endfunction " }}}2
 
 " }}}1

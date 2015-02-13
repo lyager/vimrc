@@ -55,7 +55,6 @@ let g:repeat_reg = ['', '']
 " Special function to avoid spurious repeats in a related, naturally repeating
 " mapping when your repeatable mapping doesn't increase b:changedtick.
 function! repeat#invalidate()
-    autocmd! repeat_custom_motion
     let g:repeat_tick = -1
 endfunction
 
@@ -89,24 +88,16 @@ function! repeat#run(count)
         let c = g:repeat_count
         let s = g:repeat_sequence
         let cnt = c == -1 ? "" : (a:count ? a:count : (c ? c : ''))
-        if (v:version > 703 || (v:version == 703 && has('patch100')))
-            exe 'norm ' . r . cnt . s
-        else
-            call feedkeys(r . cnt, 'n')
-            call feedkeys(s)
-        endif
+        call feedkeys(r . cnt, 'n')
+        call feedkeys(s)
     else
-        if (v:version > 703 || (v:version == 703 && has('patch100')))
-            exe 'norm! '.(a:count ? a:count : '') . '.'
-        else
-            call feedkeys((a:count ? a:count : '') . '.', 'n')
-        endif
+        call feedkeys((a:count ? a:count : '') . '.', 'n')
     endif
 endfunction
 
 function! repeat#wrap(command,count)
     let preserve = (g:repeat_tick == b:changedtick)
-    exe 'norm! '.(a:count ? a:count : '').a:command . (&foldopen =~# 'undo\|all' ? 'zv' : '')
+    exe 'norm! '.(a:count ? a:count : '').a:command . (&foldopen =~# 'undo' ? 'zv' : '')
     if preserve
         let g:repeat_tick = b:changedtick
     endif

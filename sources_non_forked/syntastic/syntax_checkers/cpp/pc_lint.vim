@@ -23,4 +23,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
     \ 'exec': 'lint-nt',
     \ 'redirect': 'c/pc_lint'})
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

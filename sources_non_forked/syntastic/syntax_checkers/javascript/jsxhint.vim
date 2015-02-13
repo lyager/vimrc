@@ -19,14 +19,10 @@ set cpo&vim
 
 function! SyntaxCheckers_javascript_jsxhint_IsAvailable() dict
     let jsxhint_version = system(self.getExecEscaped() . ' --version')
-    if v:shell_error || (jsxhint_version !~# '\m^JSXHint\>')
-        return 0
-    endif
-
-    let ver = syntastic#util#parseVersion(jsxhint_version)
-    call self.setVersion(ver)
-
-    return syntastic#util#versionIsAtLeast(ver, [0, 4, 1])
+    return
+        \ v:shell_error == 0 &&
+        \ jsxhint_version =~# '\m^JSXHint\>' &&
+        \ syntastic#util#versionIsAtLeast(syntastic#util#parseVersion(jsxhint_version), [0, 4, 1])
 endfunction
 
 function! SyntaxCheckers_javascript_jsxhint_GetLocList() dict
@@ -48,4 +44,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

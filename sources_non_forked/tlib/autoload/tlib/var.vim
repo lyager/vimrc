@@ -3,8 +3,8 @@
 " @Website:     http://www.vim.org/account/profile.php?user_id=4037
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2007-06-30.
-" @Last Change: 2014-07-08.
-" @Revision:    0.0.29
+" @Last Change: 2014-07-03.
+" @Revision:    0.0.26
 
 if &cp || exists("loaded_tlib_var_autoload")
     finish
@@ -75,16 +75,12 @@ endf
 " EXAMPLE:
 "   echo tlib#var#List('tlib_', 'g:')
 function! tlib#var#List(rx, ...) "{{{3
-    TVarArg ['prefix', 'g:']
-    if v:version >= 704
-        exec 'let varlist = keys('. prefix .')'
-    else
-        redir => vars
-        silent! exec 'let '. prefix
-        redir END
-        let varlist = split(vars, '\n')
-        call map(varlist, 'matchstr(v:val, ''^\S\+'')')
-    endif
+    TVarArg ['prefix', '']
+    redir => vars
+    silent! exec 'let '. prefix
+    redir END
+    let varlist = split(vars, '\n')
+    call map(varlist, 'matchstr(v:val, ''^\S\+'')')
     call filter(varlist, 'v:val =~ a:rx')
     return varlist
 endf

@@ -20,8 +20,7 @@ function! SyntaxCheckers_verilog_verilator_IsAvailable() dict
     if !exists('g:syntastic_verilog_compiler')
         let g:syntastic_verilog_compiler = self.getExec()
     endif
-    call self.log('g:syntastic_verilog_compiler =', g:syntastic_verilog_compiler)
-    return executable(expand(g:syntastic_verilog_compiler, 1))
+    return executable(expand(g:syntastic_verilog_compiler))
 endfunction
 
 function! SyntaxCheckers_verilog_verilator_GetLocList() dict
@@ -39,4 +38,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

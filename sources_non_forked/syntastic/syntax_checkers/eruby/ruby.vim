@@ -21,20 +21,15 @@ set cpo&vim
 function! SyntaxCheckers_eruby_ruby_IsAvailable() dict
     if !exists('g:syntastic_eruby_ruby_exec') && exists('g:syntastic_ruby_exec')
         let g:syntastic_eruby_ruby_exec = g:syntastic_ruby_exec
-        call self.log('g:syntastic_eruby_ruby_exec =', g:syntastic_eruby_ruby_exec)
     endif
     return executable(self.getExec())
 endfunction
 
 function! SyntaxCheckers_eruby_ruby_GetLocList() dict
-    if !exists('s:ruby_new')
-        let s:ruby_new = syntastic#util#versionIsAtLeast(self.getVersion(), [1, 9])
-    endif
-
-    let fname = "'" . escape(expand('%', 1), "\\'") . "'"
+    let fname = "'" . escape(expand('%'), "\\'") . "'"
 
     " TODO: encodings became useful in ruby 1.9 :)
-    if s:ruby_new
+    if syntastic#util#versionIsAtLeast(syntastic#util#getVersion(self.getExecEscaped(). ' --version'), [1, 9])
         let enc = &fileencoding != '' ? &fileencoding : &encoding
         let encoding_spec = ', :encoding => "' . (enc ==? 'utf-8' ? 'UTF-8' : 'BINARY') . '"'
     else
@@ -79,4 +74,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

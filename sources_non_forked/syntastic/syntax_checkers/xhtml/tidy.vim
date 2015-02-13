@@ -20,18 +20,16 @@ if exists("g:loaded_syntastic_xhtml_tidy_checker")
 endif
 let g:loaded_syntastic_xhtml_tidy_checker = 1
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 if !exists('g:syntastic_xhtml_tidy_ignore_errors')
     let g:syntastic_xhtml_tidy_ignore_errors = []
 endif
 
-" Constants {{{1
+let s:save_cpo = &cpo
+set cpo&vim
 
 " TODO: join this with html.vim DRY's sake?
 function! s:TidyEncOptByFenc()
-    let TIDY_OPTS = {
+    let tidy_opts = {
             \ 'utf-8':        '-utf8',
             \ 'ascii':        '-ascii',
             \ 'latin1':       '-latin1',
@@ -45,12 +43,19 @@ function! s:TidyEncOptByFenc()
             \ 'sjis':         '-shiftjis',
             \ 'cp850':        '-ibm858',
         \ }
-    return get(TIDY_OPTS, &fileencoding, '-utf8')
+    return get(tidy_opts, &fileencoding, '-utf8')
 endfunction
 
-" }}}1
+function! s:IgnoreError(text)
+    for i in g:syntastic_xhtml_tidy_ignore_errors
+        if stridx(a:text, i) != -1
+            return 1
+        endif
+    endfor
+    return 0
+endfunction
 
-function! SyntaxCheckers_xhtml_tidy_GetLocList() dict " {{{1
+function! SyntaxCheckers_xhtml_tidy_GetLocList() dict
     let encopt = s:TidyEncOptByFenc()
     let makeprg = self.makeprgBuild({ 'args_after': encopt . ' -xml -e' })
 
@@ -72,20 +77,7 @@ function! SyntaxCheckers_xhtml_tidy_GetLocList() dict " {{{1
     endfor
 
     return loclist
-endfunction " }}}1
-
-" Utilities {{{1
-
-function! s:IgnoreError(text) " {{{2
-    for item in g:syntastic_xhtml_tidy_ignore_errors
-        if stridx(a:text, item) != -1
-            return 1
-        endif
-    endfor
-    return 0
-endfunction " }}}2
-
-" }}}1
+endfunction
 
 call g:SyntasticRegistry.CreateAndRegisterChecker({
     \ 'filetype': 'xhtml',
@@ -94,4 +86,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

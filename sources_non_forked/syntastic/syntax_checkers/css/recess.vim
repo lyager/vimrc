@@ -23,4 +23,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
     \ 'name': 'recess',
     \ 'redirect': 'less/recess'})
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

@@ -1,5 +1,5 @@
 " Language:    CoffeeScript
-" Maintainer:  Mick Koch <mick@kochm.co>
+" Maintainer:  Mick Koch <kchmck@gmail.com>
 " URL:         http://github.com/kchmck/vim-coffee-script
 " License:     WTFPL
 
@@ -13,7 +13,6 @@ call coffee#CoffeeSetUpVariables()
 setlocal formatoptions-=t formatoptions+=croql
 setlocal comments=:# commentstring=#\ %s
 setlocal omnifunc=javascriptcomplete#CompleteJS
-setlocal suffixesadd+=coffee
 
 " Create custom augroups.
 augroup CoffeeBufUpdate | augroup END
@@ -331,7 +330,7 @@ function! s:CoffeeLint(startline, endline, bang, args)
   endif
 
   let output = system(g:coffee_linter .
-  \                   ' -s --reporter csv' .
+  \                   ' -s --csv' .
   \                   ' ' . b:coffee_litcoffee .
   \                   ' ' . g:coffee_lint_options .
   \                   ' ' . a:args .
@@ -395,11 +394,11 @@ if !exists('b:coffee_run_buf')
   call s:CoffeeRunResetVars()
 endif
 
-command! -buffer -range=% -bar -nargs=* -complete=customlist,s:CoffeeComplete
+command! -range=% -bar -nargs=* -complete=customlist,s:CoffeeComplete
 \        CoffeeCompile call s:CoffeeCompile(<line1>, <line2>, <q-args>)
-command! -buffer -bar -nargs=* -complete=customlist,s:CoffeeComplete
+command! -bar -nargs=* -complete=customlist,s:CoffeeComplete
 \        CoffeeWatch call s:CoffeeWatch(<q-args>)
-command! -buffer -range=% -bar -nargs=* CoffeeRun
+command! -range=% -bar -nargs=* CoffeeRun
 \        call s:CoffeeRun(<line1>, <line2>, <q-args>)
-command! -buffer -range=% -bang -bar -nargs=* CoffeeLint
+command! -range=% -bang -bar -nargs=* CoffeeLint
 \        call s:CoffeeLint(<line1>, <line2>, <q-bang>, <q-args>)

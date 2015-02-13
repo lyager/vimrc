@@ -7,7 +7,7 @@ zenroom for Vim: Focusing only on the essential](http://amix.dk/blog/post/19744#
 
 Please note that this might not work perfectly with your colorscheme. Patches are welcome to fix this :-)
 
-## Installation and usage
+## Installaion and usage
 
 * Install [goyo.vim](https://github.com/junegunn/goyo.vim)
 * In command mode type :Goyo
@@ -23,7 +23,7 @@ Additionally you may want to have a shortcut. Add this to your vimrc:
 * [vim-zenroom](https://github.com/amix/vim-zenroom)
 
 
-## How it looks in action
+## How it looks like in action
 
 ![Screenshot 3](http://amix.dk/uploads/zenroom_documentation.jpg)
 

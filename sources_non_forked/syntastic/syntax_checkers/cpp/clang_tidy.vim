@@ -22,4 +22,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
     \ 'exec': 'clang-tidy',
     \ 'redirect': 'c/clang_tidy'})
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

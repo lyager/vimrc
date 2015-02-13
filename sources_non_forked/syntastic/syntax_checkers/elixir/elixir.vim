@@ -20,9 +20,6 @@ set cpo&vim
 
 " TODO: we should probably split this into separate checkers
 function! SyntaxCheckers_elixir_elixir_IsAvailable() dict
-    call self.log(
-        \ 'executable("elixir") = ' . executable('elixir') . ', ' .
-        \ 'executable("mix") = ' . executable('mix'))
     return executable('elixir') && executable('mix')
 endfunction
 
@@ -35,7 +32,7 @@ function! SyntaxCheckers_elixir_elixir_GetLocList() dict
 
     let make_options = {}
     let compile_command = 'elixir'
-    let mix_file = syntastic#util#findInParent('mix.exs', expand('%:p:h', 1))
+    let mix_file = syntastic#util#findInParent('mix.exs', expand('%:p:h'))
 
     if filereadable(mix_file)
         let compile_command = 'mix compile'
@@ -56,4 +53,4 @@ call g:SyntasticRegistry.CreateAndRegisterChecker({
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set et sts=4 sw=4:

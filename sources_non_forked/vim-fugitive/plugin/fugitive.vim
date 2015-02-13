@@ -1,6 +1,6 @@
 " fugitive.vim - A Git wrapper so awesome, it should be illegal
 " Maintainer:   Tim Pope <http://tpo.pe/>
-" Version:      2.2
+" Version:      2.1
 " GetLatestVimScripts: 2975 1 :AutoInstall: fugitive.vim
 
 if exists('g:loaded_fugitive') || &cp
@@ -145,13 +145,6 @@ function! fugitive#extract_git_dir(path) abort
     if root ==# $GIT_WORK_TREE && fugitive#is_git_dir($GIT_DIR)
       return $GIT_DIR
     endif
-    if fugitive#is_git_dir($GIT_DIR)
-      " Ensure that we've cached the worktree
-      call s:configured_tree($GIT_DIR)
-      if has_key(s:dir_for_worktree, root)
-        return s:dir_for_worktree[root]
-      endif
-    endif
     let dir = s:sub(root, '[\/]$', '') . '/.git'
     let type = getftype(dir)
     if type ==# 'dir' && fugitive#is_git_dir(dir)
@@ -185,14 +178,7 @@ function! fugitive#detect(path) abort
     endif
   endif
   if exists('b:git_dir')
-    if exists('#User#FugitiveBoot')
-      try
-        let [save_mls, &modelines] = [&mls, 0]
-        doautocmd User FugitiveBoot
-      finally
-        let &mls = save_mls
-      endtry
-    endif
+    silent doautocmd User FugitiveBoot
     cnoremap <buffer> <expr> <C-R><C-G> fnameescape(<SID>recall())
     nnoremap <buffer> <silent> y<C-G> :call setreg(v:register, <SID>recall())<CR>
     let buffer = fugitive#buffer()
@@ -207,12 +193,7 @@ function! fugitive#detect(path) abort
         call buffer.setvar('&tags', escape(b:git_dir.'/'.&filetype.'.tags', ', ').','.buffer.getvar('&tags'))
       endif
     endif
-    try
-      let [save_mls, &modelines] = [&mls, 0]
-      doautocmd User Fugitive
-    finally
-      let &mls = save_mls
-    endtry
+    silent doautocmd User Fugitive
   endif
 endfunction
 
@@ -230,8 +211,6 @@ augroup END
 
 let s:repo_prototype = {}
 let s:repos = {}
-let s:worktree_for_dir = {}
-let s:dir_for_worktree = {}
 
 function! s:repo(...) abort
   let dir = a:0 ? a:1 : (exists('b:git_dir') && b:git_dir !=# '' ? b:git_dir : fugitive#extract_git_dir(expand('%:p')))
@@ -255,23 +234,21 @@ function! s:repo_dir(...) dict abort
   return join([self.git_dir]+a:000,'/')
 endfunction
 
-function! s:configured_tree(git_dir) abort
-  if !has_key(s:worktree_for_dir, a:git_dir)
-    let s:worktree_for_dir[a:git_dir] = ''
-    let config_file = a:git_dir . '/config'
-    if filereadable(config_file)
-      let config = readfile(config_file,'',10)
+function! s:repo_configured_tree() dict abort
+  if !has_key(self,'_tree')
+    let self._tree = ''
+    if filereadable(self.dir('config'))
+      let config = readfile(self.dir('config'),'',10)
       call filter(config,'v:val =~# "^\\s*worktree *="')
       if len(config) == 1
-        let s:worktree_for_dir[a:git_dir] = matchstr(config[0], '= *\zs.*')
-        let s:dir_for_worktree[s:worktree_for_dir[a:git_dir]] = a:git_dir
+        let self._tree = matchstr(config[0], '= *\zs.*')
       endif
     endif
   endif
-  if s:worktree_for_dir[a:git_dir] =~# '^\.'
-    return simplify(a:git_dir . '/' . s:worktree_for_dir[a:git_dir])
+  if self._tree =~# '^\.'
+    return simplify(self.dir(self._tree))
   else
-    return s:worktree_for_dir[a:git_dir]
+    return self._tree
   endif
 endfunction
 
@@ -279,7 +256,7 @@ function! s:repo_tree(...) dict abort
   if self.dir() =~# '/\.git$'
     let dir = self.dir()[0:-6]
   else
-    let dir = s:configured_tree(self.git_dir)
+    let dir = self.configured_tree()
   endif
   if dir ==# ''
     call s:throw('no work tree')
@@ -292,7 +269,7 @@ function! s:repo_bare() dict abort
   if self.dir() =~# '/\.git$'
     return 0
   else
-    return s:configured_tree(self.git_dir) ==# ''
+    return self.configured_tree() ==# ''
   endif
 endfunction
 
@@ -357,7 +334,7 @@ function! s:repo_head(...) dict abort
     return branch
 endfunction
 
-call s:add_methods('repo',['dir','tree','bare','translate','head'])
+call s:add_methods('repo',['dir','configured_tree','tree','bare','translate','head'])
 
 function! s:repo_git_command(...) dict abort
   let git = g:fugitive_git_executable . ' --git-dir='.s:shellesc(self.git_dir)
@@ -1759,7 +1736,7 @@ function! s:Diff(vert,...) abort
     let winnr = winnr()
     if getwinvar('#', '&diff')
       wincmd p
-      call feedkeys(winnr."\<C-W>w", 'n')
+      call feedkeys("\<C-W>p", 'n')
     endif
     return ''
   catch /^fugitive:/
@@ -2297,7 +2274,7 @@ endfunction
 function! s:instaweb_url(opts) abort
   let output = a:opts.repo.git_chomp('instaweb','-b','unknown')
   if output =~# 'http://'
-    let root = matchstr(output,'http://.*').'/?p='.fnamemodify(a:opts.repo.dir(),':t')
+    let root = matchstr(output,'http://.*').'/?p='.fnamemodify(a:opts.repo.opts.dir(),':t')
   else
     return ''
   endif
@@ -2518,9 +2495,7 @@ function! s:BufWriteIndexFile() abort
     endif
     if v:shell_error == 0
       setlocal nomodified
-      if exists('#BufWritePost')
-        execute 'doautocmd BufWritePost '.s:fnameescape(expand('%:p'))
-      endif
+      silent execute 'doautocmd BufWritePost '.s:fnameescape(expand('%:p'))
       call fugitive#reload_status()
       return ''
     else
