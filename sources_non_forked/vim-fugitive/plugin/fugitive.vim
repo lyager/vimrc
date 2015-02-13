@@ -2225,11 +2225,7 @@ function! s:Browse(bang,line1,count,...) abort
     elseif exists(':Browse') == 2
       return 'echomsg '.string(url).'|Browse '.url
     else
-      if has("patch-7.4.567")
-        return 'echomsg '.string(url).'|call netrw#BrowseX('.string(url).', 0)'
-      else
-        return 'echomsg '.string(url).'|call netrw#NetrwBrowseX('.string(url).', 0)'
-      endif
+      return 'echomsg '.string(url).'|call netrw#NetrwBrowseX('.string(url).', 0)'
     endif
   catch /^fugitive:/
     return 'echoerr v:errmsg'

@@ -1,25 +1,25 @@
-function! s:sfile() abort
+function! s:sfile()
 	return expand('<sfile>')
 endfunction
 
 let s:state_proto = {}
 
-function! snipmate#jumping#state() abort
+function! snipmate#jumping#state()
 	return copy(s:state_proto)
 endfunction
 
-function! s:listize_mirror(mirrors) abort
+function! s:listize_mirror(mirrors)
 	return map(copy(a:mirrors), '[v:val.line, v:val.col]')
 endfunction
 
 " Removes snippet state info
-function! s:state_remove() dict abort
+function! s:state_remove() dict
 	" Remove all autocmds in group snipmate_changes in the current buffer
 	unlet! b:snip_state
 	silent! au! snipmate_changes * <buffer>
 endfunction
 
-function! s:state_find_next_stop(backwards) dict abort
+function! s:state_find_next_stop(backwards) dict
 	let self.stop_no += a:backwards? -1 : 1
 	while !has_key(self.stops, self.stop_no)
 		if self.stop_no == self.stop_count
@@ -33,7 +33,7 @@ function! s:state_find_next_stop(backwards) dict abort
 endfunction
 
 " Update state information to correspond to the given tab stop
-function! s:state_set_stop(backwards) dict abort
+function! s:state_set_stop(backwards) dict
 	call self.find_next_stop(a:backwards)
 	let self.cur_stop    = self.stops[self.stop_no]
 	let self.stop_len = (type(self.cur_stop.placeholder) == type(0))
@@ -54,7 +54,7 @@ function! s:state_set_stop(backwards) dict abort
 endfunction
 
 " Jump to the next/previous tab stop
-function! s:state_jump_stop(backwards) dict abort
+function! s:state_jump_stop(backwards) dict
 	" Update changes just in case
 	" This seems to be only needed because insert completion does not trigger
 	" the CursorMovedI event
@@ -72,7 +72,7 @@ function! s:state_jump_stop(backwards) dict abort
 	return self.set_stop(a:backwards)
 endfunction
 
-function! s:state_remove_nested(...) dict abort
+function! s:state_remove_nested(...) dict
 	let id = a:0 ? a:1 : self.stop_no
 	if type(self.stops[id].placeholder) == type([])
 		for i in self.stops[id].placeholder
@@ -90,7 +90,7 @@ function! s:state_remove_nested(...) dict abort
 endfunction
 
 " Select the placeholder for the current tab stop
-function! s:state_select_word() dict abort
+function! s:state_select_word() dict
 	let len = self.stop_len
 	if !len | return '' | endif
 	let l = col('.') != 1 ? 'l' : ''
@@ -103,7 +103,7 @@ endfunction
 " Update the snippet as text is typed. The self.update_mirrors() function does
 " the actual work.
 " If the cursor moves outside of a placeholder, call self.remove()
-function! s:state_update_changes() dict abort
+function! s:state_update_changes() dict
 	let change_len = col('$') - self.prev_len
 	let self.changed = self.changed || change_len != 0
 	let self.end_col += change_len
@@ -122,7 +122,7 @@ function! s:state_update_changes() dict abort
 endfunction
 
 " Actually update the mirrors for any changed text
-function! s:state_update_mirrors(change) dict abort
+function! s:state_update_mirrors(change) dict
 	let newWordLen = self.end_col - self.start_col
 	let newWord = strpart(getline('.'), self.start_col - 1, newWordLen)
 	let changeLen = a:change
@@ -159,7 +159,7 @@ function! s:state_update_mirrors(change) dict abort
 	endif
 endfunction
 
-function! s:state_find_update_objects(item) dict abort
+function! s:state_find_update_objects(item) dict
 	let item = a:item
 	let item.update_objects = []
 
@@ -179,7 +179,7 @@ function! s:state_find_update_objects(item) dict abort
 	return item.update_objects
 endfunction
 
-function! s:state_update(item, change_len) dict abort
+function! s:state_update(item, change_len) dict
 	let item = a:item
 	if exists('item.update_objects')
 		let to_update = item.update_objects

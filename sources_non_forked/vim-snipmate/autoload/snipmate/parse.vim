@@ -1,12 +1,12 @@
 " Snippet definition parsing code
 
-function! s:sfile() abort
+function! s:sfile()
     return expand('<sfile>')
 endfunction
 
 let s:parser_proto = {}
 
-function! s:new_parser(text) abort
+function! s:new_parser(text)
     let ret = copy(s:parser_proto)
     let ret.input = a:text
     let ret.len = strlen(ret.input)
@@ -18,12 +18,12 @@ function! s:new_parser(text) abort
     return ret
 endfunction
 
-function! s:parser_advance(...) dict abort
+function! s:parser_advance(...) dict
     let self.pos += a:0 ? a:1 : 1
     let self.next = self.input[self.pos]
 endfunction
 
-function! s:parser_same(tok) dict abort
+function! s:parser_same(tok) dict
     if self.next == a:tok
         call self.advance()
         return 1
@@ -32,7 +32,7 @@ function! s:parser_same(tok) dict abort
     endif
 endfunction
 
-function! s:parser_id() dict abort
+function! s:parser_id() dict
     if self.input[(self.pos):(self.pos+5)] == 'VISUAL'
         call self.advance(6)
         return 'VISUAL'
@@ -45,7 +45,7 @@ function! s:parser_id() dict abort
     return -1
 endfunction
 
-function! s:parser_add_var(var) dict abort
+function! s:parser_add_var(var) dict
     let id = a:var[0]
     if !has_key(self.vars, id)
         let self.vars[id] = { 'instances' : [] }
@@ -53,7 +53,7 @@ function! s:parser_add_var(var) dict abort
     call add(self.vars[id].instances, a:var)
 endfunction
 
-function! s:parser_var() dict abort
+function! s:parser_var() dict
     let ret = []
     if self.same('{')
         let id = self.id()
@@ -70,7 +70,7 @@ function! s:parser_var() dict abort
     return ret
 endfunction
 
-function! s:parser_varend() dict abort
+function! s:parser_varend() dict
     let ret = []
     if self.same(':')
         call extend(ret, self.placeholder())
@@ -81,11 +81,11 @@ function! s:parser_varend() dict abort
     return ret
 endfunction
 
-function! s:parser_placeholder() dict abort
+function! s:parser_placeholder() dict
     return self.parse('}')
 endfunction
 
-function! s:parser_subst() dict abort
+function! s:parser_subst() dict
     let ret = {}
     let ret.pat = join(self.text('/', 1))
     if self.same('/')
@@ -97,14 +97,14 @@ function! s:parser_subst() dict abort
     return ret
 endfunction
 
-function! s:parser_expr() dict abort
+function! s:parser_expr() dict
     let str = join(self.text('`', 1))
     let ret = eval(str)
     call self.same('`')
     return type(ret) == type('') ? ret : string(ret)
 endfunction
 
-function! s:parser_text(...) dict abort
+function! s:parser_text(...) dict
     let res = []
     let val = ''
     if a:0 == 2 && a:2
@@ -140,7 +140,7 @@ function! s:parser_text(...) dict abort
     return res
 endfunction
 
-function! s:parser_parse(...) dict abort
+function! s:parser_parse(...) dict
     let ret = a:0 ? [] : self.value
     while self.pos < self.len
         if self.same('$')
@@ -186,7 +186,7 @@ call extend(s:parser_proto, snipmate#util#add_methods(s:sfile(), 'parser',
             \ [ 'advance', 'same', 'id', 'add_var', 'var', 'varend',
             \ 'placeholder', 'subst', 'expr', 'text', 'parse' ]), 'error')
 
-function! s:indent(count) abort
+function! s:indent(count)
     if &expandtab
         let shift = repeat(' ', (&sts > 0) ? &sts : &sw)
     else
@@ -195,7 +195,7 @@ function! s:indent(count) abort
     return repeat(shift, a:count)
 endfunction
 
-function! s:visual_placeholder(var, indent) abort
+function! s:visual_placeholder(var, indent)
     let arg = get(a:var, 1, {})
     if type(arg) == type({})
         let pat = get(arg, 'pat', '')
@@ -212,7 +212,7 @@ function! s:visual_placeholder(var, indent) abort
     return content
 endfunction
 
-function! snipmate#parse#snippet(text) abort
+function! snipmate#parse#snippet(text)
     let parser = s:new_parser(a:text)
     call parser.parse()
     unlet! b:snipmate_visual

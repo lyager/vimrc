@@ -1,12 +1,12 @@
-function! Setup(snip) abort
+function! Setup(snip)
     return snipMate#expandSnip(join(a:snip, "\n"), 1)
 endfunction
 
-function! s:to_be_file(expected) abort
+function! s:to_be_file(expected)
     return a:expected == getline(1,'$')
 endfunction
 
-function! s:to_be_in(item, list) abort
+function! s:to_be_in(item, list)
     return !empty(filter(copy(a:list), 'v:val is a:item'))
 endfunction
 

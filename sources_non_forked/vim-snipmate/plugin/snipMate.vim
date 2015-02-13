@@ -105,7 +105,7 @@ let g:snipMate['get_scopes'] = get(g:snipMate, 'get_scopes', funcref#Function('r
 
 " Modified from Luc Hermitte's function on StackOverflow
 " <http://stackoverflow.com/a/1534347>
-function! s:grab_visual() abort
+function! s:grab_visual()
 	let a_save = @a
 	try
 		normal! gv"ay
@@ -116,7 +116,7 @@ function! s:grab_visual() abort
 endfunction
 
 " TODO: Allow specifying an arbitrary snippets file
-function! s:load_scopes(bang, ...) abort
+function! s:load_scopes(bang, ...)
 	let gb = a:bang ? g: : b:
 	let gb.snipMate = get(gb, 'snipMate', {})
 	let gb.snipMate.scope_aliases = get(gb.snipMate, 'scope_aliases', {})

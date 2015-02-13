@@ -9,7 +9,7 @@ catch /.*/
 	echoe "you're missing tlib. See install instructions at ".expand('<sfile>:h:h').'/README.md'
 endtry
 
-fun! Filename(...) abort
+fun! Filename(...)
 	let filename = expand('%:t:r')
 	if filename == '' | return a:0 == 2 ? a:2 : '' | endif
 	return !a:0 || a:1 == '' ? filename : substitute(a:1, '$1', filename, 'g')
@@ -17,7 +17,7 @@ endf
 
 let s:cache = {}
 
-function! snipMate#expandSnip(snip, version, col) abort
+function! snipMate#expandSnip(snip, version, col)
 	let lnum = line('.')
 	let col = a:col
 	let line = getline(lnum)
@@ -76,11 +76,11 @@ function! snipMate#expandSnip(snip, version, col) abort
 	return b:snip_state.set_stop(0)
 endfunction
 
-function! snipMate#placeholder_str(num, stops) abort
+function! snipMate#placeholder_str(num, stops)
 	return snipMate#sniplist_str(a:stops[a:num].placeholder, a:stops)[0]
 endfunction
 
-function! snipMate#sniplist_str(snippet, stops) abort
+function! snipMate#sniplist_str(snippet, stops)
 	let lines = ['']
 	let pos = 0
 	let add_to = 1
@@ -108,7 +108,7 @@ function! snipMate#sniplist_str(snippet, stops) abort
 	return lines
 endfunction
 
-function! s:build_stops(snippet, stops, lnum, col, indent) abort
+function! s:build_stops(snippet, stops, lnum, col, indent)
 	let stops = a:stops
 	let line  = a:lnum
 	let col   = a:col
@@ -146,7 +146,7 @@ function! s:build_stops(snippet, stops, lnum, col, indent) abort
 	return stop_count
 endfunction
 
-function! s:build_loc_info(snippet, stops, line, col, indent) abort
+function! s:build_loc_info(snippet, stops, line, col, indent)
 	let stops   = a:stops
 	let line    = a:line
 	let col     = a:col
@@ -183,7 +183,7 @@ function! s:build_loc_info(snippet, stops, line, col, indent) abort
 	return [line, col]
 endfunction
 
-function! s:add_mirror(stops, id, line, col, item) abort
+function! s:add_mirror(stops, id, line, col, item)
 	let stops = a:stops
 	let item = a:item
 	let stops[a:id].mirrors = get(stops[a:id], 'mirrors', [])
@@ -201,7 +201,7 @@ endfunction
 " ['triggername', 'name', 'contents']
 " if triggername is not set 'default' is assumed
 " TODO: better error checking
-fun! snipMate#ReadSnippetsFile(file) abort
+fun! snipMate#ReadSnippetsFile(file)
 	let result = []
 	let new_scopes = []
 	if !filereadable(a:file) | return [result, new_scopes] | endif
@@ -245,7 +245,7 @@ fun! snipMate#ReadSnippetsFile(file) abort
 	return [result, new_scopes]
 endf
 
-function! s:GetScopes() abort
+function! s:GetScopes()
 	let ret = exists('b:snipMate.scope_aliases') ? copy(b:snipMate.scope_aliases) : {}
 	let global = get(g:snipMate, 'scope_aliases', {})
 	for alias in keys(global)
@@ -262,7 +262,7 @@ endfunction
 " adds scope aliases to list.
 " returns new list
 " the aliases of aliases are added recursively
-fun! s:AddScopeAliases(list) abort
+fun! s:AddScopeAliases(list)
   let did = {}
   let scope_aliases = s:GetScopes()
   let new = a:list
@@ -282,7 +282,7 @@ endf
 
 au SourceCmd *.snippet,*.snippets call s:source_snippet()
 
-function! s:info_from_filename(file) abort
+function! s:info_from_filename(file)
 	let parts = split(fnamemodify(a:file, ':r'), '/')
 	let snipidx = len(parts) - index(reverse(copy(parts)), 'snippets') - 1
 	let rtp_prefix = join(parts[(snipidx -
@@ -293,7 +293,7 @@ function! s:info_from_filename(file) abort
 	return [rtp_prefix, trigger, desc]
 endfunction
 
-function! s:source_snippet() abort
+function! s:source_snippet()
 	let file = expand('<afile>:p')
 	let [rtp_prefix, trigger, desc] = s:info_from_filename(file)
 	let new_snips = []
@@ -316,7 +316,7 @@ function! s:source_snippet() abort
 	call extend(s:lookup_state.snips, new_snips)
 endfunction
 
-function! s:CachedSnips(file) abort
+function! s:CachedSnips(file)
 	let mtime = getftime(a:file)
 	if has_key(s:cache, a:file) && s:cache[a:file].mtime >= mtime
 		return s:cache[a:file].contents
@@ -327,14 +327,15 @@ function! s:CachedSnips(file) abort
 	return s:cache[a:file].contents
 endfunction
 
-function! s:snippet_filenames(scope, trigger) abort
+function! s:snippet_filenames(scope, trigger)
 	let mid = ['', '_*', '/*']
-	let mid += map(copy(mid[1:]), "'/' . a:trigger . '*' . v:val")
-	return join(map(mid, "'snippets/' . a:scope . v:val . '.snippet'"
+	return join(map(extend(mid, map(filter(copy(mid), 'v:key != 1'),
+				\ "'/' . a:trigger . '*' . v:val")),
+				\ "'snippets/' . a:scope . v:val . '.snippet'"
 				\ . ". (v:key < 3 ? 's' : '')"))
 endfunction
 
-function! snipMate#SetByPath(dict, trigger, path, snippet, bang, snipversion) abort
+function! snipMate#SetByPath(dict, trigger, path, snippet, bang, snipversion)
 	let d = a:dict
 	if !has_key(d, a:trigger) || a:bang
 		let d[a:trigger] = {}
@@ -343,7 +344,7 @@ function! snipMate#SetByPath(dict, trigger, path, snippet, bang, snipversion) ab
 endfunction
 
 " default triggers based on paths
-function! snipMate#DefaultPool(scopes, trigger, result) abort
+function! snipMate#DefaultPool(scopes, trigger, result)
 	let scopes = s:AddScopeAliases(a:scopes)
 	let scopes_done = []
 	let rtp_save = &rtp
@@ -376,7 +377,7 @@ endfunction
 " scopes: list of scopes. usually this is the filetype. eg ['c','cpp']
 " trigger may contain glob patterns. Thus use '*' to get all triggers
 "
-fun! snipMate#GetSnippets(scopes, trigger) abort
+fun! snipMate#GetSnippets(scopes, trigger)
 	let result = {}
 
 	for F in values(g:snipMateSources)
@@ -388,7 +389,7 @@ endf
 " adds leading tab
 " and replaces leading spaces by tabs
 " see ftplugin/snippet.vim
-fun! snipMate#RetabSnip() range abort
+fun! snipMate#RetabSnip() range
   let leadingTab = expand('%:e') == 'snippets'
 
   let lines = getline(a:firstline, a:lastline)
@@ -423,7 +424,7 @@ fun! snipMate#RetabSnip() range abort
   endfor
 endf
 
-fun! snipMate#OpenSnippetFiles() abort
+fun! snipMate#OpenSnippetFiles()
   let dict = snipMate#GetSnippetFiles(0, snipMate#ScopesByFile(), '*')
   " sort by files wether they exist - put existing files first
   let exists = []
@@ -444,13 +445,13 @@ fun! snipMate#OpenSnippetFiles() abort
   endfor
 endf
 
-fun! snipMate#ScopesByFile() abort
+fun! snipMate#ScopesByFile()
 	" duplicates are removed in AddScopeAliases
 	return filter(funcref#Call(g:snipMate.get_scopes), "v:val != ''")
 endf
 
 " used by both: completion and insert snippet
-fun! snipMate#GetSnippetsForWordBelowCursor(word, exact) abort
+fun! snipMate#GetSnippetsForWordBelowCursor(word, exact)
 	" Setup lookups: '1.2.3' becomes [1.2.3] + [3, 2.3]
 	let parts = split(a:word, '\W\zs')
 	" Since '\W\zs' results in splitting *after* a non-keyword character, the
@@ -498,7 +499,7 @@ endf
 
 " snippets: dict containing snippets by name
 " usually this is just {'default' : snippet_contents }
-fun! s:ChooseSnippet(snippets) abort
+fun! s:ChooseSnippet(snippets)
 	let snippet = []
 	let keys = keys(a:snippets)
 	let i = 1
@@ -520,22 +521,22 @@ fun! s:ChooseSnippet(snippets) abort
 	return funcref#Call(a:snippets[keys(a:snippets)[idx]])
 endf
 
-fun! snipMate#WordBelowCursor() abort
+fun! snipMate#WordBelowCursor()
 	return matchstr(getline('.'), '\S\+\%' . col('.') . 'c')
 endf
 
-fun! snipMate#GetSnippetsForWordBelowCursorForComplete(word) abort
+fun! snipMate#GetSnippetsForWordBelowCursorForComplete(word)
 	let snippets = map(snipMate#GetSnippetsForWordBelowCursor(a:word, 0), 'v:val[0]')
 	return filter(snippets, 'v:val =~# "\\V\\^' . escape(a:word, '"\') . '"')
 endf
 
-fun! snipMate#CanBeTriggered() abort
+fun! snipMate#CanBeTriggered()
 	let word    = snipMate#WordBelowCursor()
 	let matches = snipMate#GetSnippetsForWordBelowCursorForComplete(word)
 	return len(matches) > 0
 endf
 
-fun! snipMate#ShowAvailableSnips() abort
+fun! snipMate#ShowAvailableSnips()
 	let col     = col('.')
 	let word    = snipMate#WordBelowCursor()
 	let matches = snipMate#GetSnippetsForWordBelowCursorForComplete(word)
@@ -551,7 +552,7 @@ fun! snipMate#ShowAvailableSnips() abort
 endf
 
 " Pass an argument to force snippet expansion instead of triggering or jumping
-function! snipMate#TriggerSnippet(...) abort
+function! snipMate#TriggerSnippet(...)
 	if exists('g:SuperTabMappingForward')
 		if g:SuperTabMappingForward == "<tab>"
 			let SuperTabPlug = maparg('<Plug>SuperTabForward', 'i')
@@ -609,7 +610,7 @@ function! snipMate#TriggerSnippet(...) abort
 	  \ : "\<c-r>=snipMate#ShowAvailableSnips()\<cr>"
 endfunction
 
-fun! snipMate#BackwardsSnippet() abort
+fun! snipMate#BackwardsSnippet()
 	if exists('b:snip_state') | return b:snip_state.jump_stop(1) | endif
 
 	if exists('g:SuperTabMappingForward')

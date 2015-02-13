@@ -5,6 +5,6 @@ endif
 let s:did_snip_helper = 1
 
 " Automatically closes tag if in xhtml
-fun! Close() abort
+fun! Close()
 	return stridx(&ft, 'xhtml') == -1 ? '' : ' /'
 endf

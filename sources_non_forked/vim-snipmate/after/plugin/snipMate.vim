@@ -5,7 +5,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:map_if_not_mapped(lhs, rhs, mode) abort
+function! s:map_if_not_mapped(lhs, rhs, mode)
     let l:unique = s:overwrite ? '' : ' <unique>'
     if !hasmapto(a:rhs, a:mode)
 	silent! exe a:mode . 'map' . l:unique a:lhs a:rhs

@@ -59,22 +59,19 @@ function! s:toggle_on()
   let [ s:original_tabline, s:original_showtabline ] = [ &tabline, &showtabline ]
 
   set tabline=%!airline#extensions#tabline#get()
-  augroup airline_tabline
-    autocmd!
-    " Invalidate cache.
-    autocmd BufAdd,BufUnload * unlet! s:current_buffer_list
-
-    if s:buf_min_count <= 0 && s:tab_min_count <= 1
-      set showtabline=2
-    else
+  if s:buf_min_count <= 0 && s:tab_min_count <= 1
+    set showtabline=2
+  else
+    augroup airline_tabline
+      autocmd!
       if s:show_buffers == 1
         autocmd BufEnter * call <sid>show_tabline(s:buf_min_count, len(s:get_buffer_list()))
         autocmd BufUnload * call <sid>show_tabline(s:buf_min_count, len(s:get_buffer_list()) - 1)
       else
         autocmd TabEnter * call <sid>show_tabline(s:tab_min_count, tabpagenr('$'))
       endif
-    endif
-  augroup END
+    augroup END
+  endif
 endfunction
 
 function! airline#extensions#tabline#load_theme(palette)
@@ -133,14 +130,10 @@ function! airline#extensions#tabline#title(n)
 endfunction
 
 function! airline#extensions#tabline#get_buffer_name(nr)
-  return airline#extensions#tabline#{s:formatter}#format(a:nr, s:get_buffer_list())
+  return airline#extensions#tabline#{s:formatter}#format(a:nr, get(s:, 'current_buffer_list', s:get_buffer_list()))
 endfunction
 
 function! s:get_buffer_list()
-  if exists('s:current_buffer_list')
-    return s:current_buffer_list
-  endif
-
   let buffers = []
   let cur = bufnr('%')
   for nr in range(1, bufnr('$'))
