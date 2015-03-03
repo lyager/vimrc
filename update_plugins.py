@@ -40,6 +40,7 @@ vim-repeat https://github.com/tpope/vim-repeat
 vim-commentary https://github.com/tpope/vim-commentary
 vim-go https://github.com/fatih/vim-go
 vim-easymotion https://github.com/Lokaltog/vim-easymotion/
+vim-python-pep8-indent https://github.com/hynek/vim-python-pep8-indent
 """.strip()
 
 GITHUB_ZIP = '%s/archive/master.zip'
