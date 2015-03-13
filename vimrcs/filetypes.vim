@@ -57,7 +57,7 @@ au FileType coffee call CoffeeScriptFold()
 au FileType gitcommit call setpos('.', [0, 1, 1, 0])
 
 """"""""""""""""""""""""""""""
-" => C section
+" => C/C++ section
 """""""""""""""""""""""""""""""
 " Find functionname
 fun! ShowFuncName()
@@ -69,6 +69,7 @@ fun! ShowFuncName()
   call search("\\%" . lnum . "l" . "\\%" . col . "c")
 endfun
 au FileType c map f :call ShowFuncName() <CR>
+au FileType cpp map f :call ShowFuncName() <CR>
 
 " List all functions
 
@@ -77,6 +78,7 @@ fun! ShowAllFuncName()
 endfun
 
 au FileType c map F :call ShowAllFuncName() <CR>
+au FileType cpp map F :call ShowAllFuncName() <CR>
 
 """"""""""""""""""""""""""""""
 " => GitCommit section
